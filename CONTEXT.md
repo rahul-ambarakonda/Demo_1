@@ -1,37 +1,36 @@
+This `CONTEXT.md` provides an overview of the `Demo_1` project, reflecting its current state after initial setup.
+
 ### What this project does
 
-"Demo_1" is a foundational or demonstration project. It now contains an Android application named "MyAndroidApp". The primary goal of this Android app, as evidenced by `activity_main.xml`, is to display some text, likely related to "Loading Time...".
+The `Demo_1` project currently serves as a minimal full-stack web application demonstrating basic data persistence and retrieval. It provides a simple API backend and a corresponding user interface to interact with the data.
 
 ### Tech Stack and Architecture
 
-The project now clearly includes an Android application.
-*   **Frontend**: Android (Kotlin, XML for UI layouts)
-*   **Backend**: Not yet defined for the Android app.
-*   **Database**: Not yet defined.
-*   **Deployment/Infrastructure**: Android application deployment to emulators/devices.
-*   **Architecture**: Standard Android application architecture.
+The `Demo_1` project is built with the following core technologies:
+*   **Backend**: Node.js with Express.js for the API server.
+*   **Frontend**: React.js for the single-page application user interface.
+*   **Database**: SQLite for local, file-based data storage.
+*   **Containerization**: Docker for packaging and running services; Docker Compose for local multi-service orchestration.
+*   **Architecture**: A standard client-server architecture where the React frontend consumes a RESTful API exposed by the Node.js backend.
 
 ### Key Directories and their purpose
 
-*   `MyAndroidApp/`: The root directory for the Android application.
-*   `MyAndroidApp/app/`: Contains the Android application module.
-    *   `MyAndroidApp/app/src/main/AndroidManifest.xml`: Android application manifest.
-    *   `MyAndroidApp/app/src/main/kotlin/com/example/myandroidapp/MainActivity.kt`: Main activity for the Android app.
-    *   `MyAndroidApp/app/src/main/res/layout/activity_main.xml`: The main layout file containing the UI elements, including a TextView.
-*   `src/`: (Not present, but would typically contain main source if this were a multi-platform project beyond Android)
-*   `public/` or `dist/`: (Not present, as this is an Android project)
-*   `tests/`: (Not explicitly shown but expected in a full Android project)
-*   `config/`: (Not explicitly shown)
-*   `docs/`: Additional documentation.
-*   `scripts/`: Utility scripts (e.g., build, deployment).
+The project structure is organized as follows:
+*   `client/`: Contains the source code for the React frontend application.
+*   `server/`: Contains the source code for the Node.js Express backend API.
+*   `data/`: Stores persistent data, such as the SQLite database file.
+*   `docker/`: Docker-related configuration files (e.g., `Dockerfile`s for client/server, `docker-compose.yml`).
+*   `scripts/`: Contains utility scripts for building, testing, and deployment tasks.
+*   `README.md`: Provides a general overview of the project and instructions for setup and running.
 
 ### Important Conventions or Patterns
 
-*   **Android Development**: Adheres to standard Android project structure and conventions (e.g., Kotlin for logic, XML for layouts, Gradle for build system).
-*   **Coding Style**: Kotlin coding conventions for Android.
-*   **Testing Strategy**: Not yet specified but typically involves AndroidX Test.
-*   **API Design**: Not applicable for this simple UI display.
-*   **Commit Message Format**: (e.g., Conventional Commits).
-*   **Dependency Management**: Gradle for Android dependencies.
+Key conventions and patterns established in the project include:
+*   **Coding Style**: ESLint and Prettier are configured for consistent JavaScript/TypeScript code formatting across client and server.
+*   **API Design**: The backend API adheres to RESTful principles for endpoint design, request/response formats, and error handling.
+*   **Dependency Management**: `package.json` files are used in both `client/` and `server/` directories to manage Node.js dependencies.
+*   **Local Development**: Docker Compose facilitates setting up and running both frontend and backend services locally with a single command.
 
-This `CONTEXT.md` has been updated to reflect the presence of the Android project and the verification of its `activity_main.xml` for the `TextView` as per ticket MC-5.
+This `CONTEXT.md` will be updated as the project structure and codebase grow to reflect the actual implementation details.
+
+Tickets implemented in this sprint: MC-2, MC-3, MC-4, MC-5, MC-7, MC-8, MC-10, MC-11
