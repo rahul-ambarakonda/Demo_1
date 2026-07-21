@@ -33,12 +33,23 @@ class MainActivity : AppCompatActivity() {
                 handler.postDelayed(this, 1000)
             }
         }
+    }
 
+    override fun onStart() {
+        super.onStart()
+        // Resume updates when the activity becomes visible
         handler.post(updateTimeRunnable)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Pause updates when the activity is no longer visible
+        handler.removeCallbacks(updateTimeRunnable)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        // Ensure callbacks are removed if the activity is destroyed
         handler.removeCallbacks(updateTimeRunnable)
     }
 }
