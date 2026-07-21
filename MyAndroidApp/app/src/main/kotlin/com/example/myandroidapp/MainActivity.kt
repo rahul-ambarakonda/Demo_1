@@ -1,1 +1,27 @@
-package com.example.myandroidapp\n\nimport android.os.Bundle\nimport androidx.activity.ComponentActivity\nimport androidx.activity.compose.setContent\nimport androidx.compose.foundation.layout.fillMaxSize\nimport androidx.compose.material3.MaterialTheme\nimport androidx.compose.material3.Surface\nimport androidx.compose.material3.Text\nimport androidx.compose.runtime.Composable\nimport androidx.compose.ui.Modifier\nimport androidx.compose.ui.tooling.preview.Preview\nimport com.example.myandroidapp.ui.theme.MyAndroidAppTheme\n\nclass MainActivity : ComponentActivity() {\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        setContent {\n            MyAndroidAppTheme {\n                // A surface container using the 'background' color from the theme\n                Surface(\n                    modifier = Modifier.fillMaxSize(),\n                    color = MaterialTheme.colorScheme.background\n                ) {\n                    Greeting(\"Android\")\n                }\n            }\n        }\n    }\n}\n\n@Composable\nfun Greeting(name: String, modifier: Modifier = Modifier) {\n    Text(\n        text = \"Hello \$name!\",\n        modifier = modifier\n    )\n}\n\n@Preview(showBackground = true)\n@Composable\nfun GreetingPreview() {\n    MyAndroidAppTheme {\n        Greeting(\"Android\")\n    }\n}
+package com.example.myandroidapp
+
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity // Changed from ComponentActivity
+import android.widget.TextView // Import TextView
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main) // Set the XML layout
+
+        val timeTextView: TextView = findViewById(R.id.timeTextView)
+
+        // Get current system time
+        val currentTime = Calendar.getInstance().time
+
+        // Format the time (e.g., HH:mm:ss)
+        val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val formattedTime = timeFormat.format(currentTime)
+
+        // Set the formatted time to the TextView
+        timeTextView.text = "Current Time: $formattedTime"
+    }
+}
