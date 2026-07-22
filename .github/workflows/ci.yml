@@ -1,0 +1,110 @@
+```yaml
+# This workflow performs Continuous Integration (CI) and Continuous Deployment (CD) for the Demo_1 project.
+#
+# Project Description:
+# The `Demo_1` project currently serves as a minimal full-stack web application demonstrating basic data persistence and retrieval.
+# It provides a simple API backend (Node.js with Express.js) and a corresponding user interface (React.js)
+# to interact with the data, using SQLite for local, file-based data storage.
+#
+# Sprint Work Completed:
+# MC-2, MC-3, MC-4, MC-5, MC-7, MC-8, MC-10, MC-11
+
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x' # Using a recent LTS version for Node.js based projects
+
+      - name: Install client dependencies
+        run: |
+          cd client
+          npm ci
+
+      - name: Build client
+        run: |
+          cd client
+          npm run build
+
+      - name: Install server dependencies
+        run: |
+          cd server
+          npm ci
+
+      # Additional CI steps like linting, testing, etc., can be added here if defined in the project's CONTEXT.md.
+      # Based on the current CONTEXT.md, primary CI involves dependency installation and client build.
+
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: ci # This job depends on the successful completion of the 'ci' job
+    # Deploy only on push events to the 'main' branch, not on pull requests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Source nvm so node/npm/pnpm are available in the non-interactive SSH shell
+            export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+            # Change to the designated deployment directory
+            cd ${{ secrets.EC2_DEPLOY_PATH }}
+
+            # Fetch the latest changes from the 'main' branch and hard-reset the local repository
+            # This ensures that any local changes on the server (e.g., package-lock.json) do not conflict
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Sync new environment variables from .env.sample into .env
+            # This appends only keys that are missing in .env, never overwriting existing values.
+            if [ -f .env.sample ]; then
+              touch .env
+              while IFS= read -r line; do
+                # Skip blank lines and lines starting with # (comments)
+                [[ -z "$line" || "$line" == \#* ]] && continue
+                # Extract the key part of the env var (e.g., from KEY=VALUE, get KEY)
+                key=$(echo "$line" | cut -d= -f1)
+                # Only append the line to .env if the key is not already present
+                if ! grep -q "^${key}=" .env 2>/dev/null; then
+                  echo "$line" >> .env
+                  echo "⚠️  New env var added (set real value): ${key}"
+                fi
+              done < .env.sample
+            fi
+
+            # Install dependencies and run the build step for both client and server
+            # For client (React.js), install dependencies and run build
+            cd client && npm ci && npm run build && cd ..
+            # For server (Node.js/Express.js), install dependencies (no build step typically needed)
+            cd server && npm ci && cd ..
+
+            # Restart the application using PM2 with zero-downtime reload.
+            # If the PM2 process named 'app' doesn't exist yet, it will start a new one.
+            # The entrypoint for the Node.js server is assumed to be 'server/index.js'.
+            pm2 reload app --update-env || pm2 start server/index.js --name app
+            # Save the current PM2 process list to be restored on server reboot
+            pm2 save
+```
